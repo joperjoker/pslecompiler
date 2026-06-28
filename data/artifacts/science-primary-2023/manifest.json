@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-06-28T23:56:17.058807+00:00",
+  "node_count": 201,
+  "edge_count": 287,
+  "label_counts": {
+    "Subject": 1,
+    "SyllabusVersion": 1,
+    "Theme": 5,
+    "Topic": 25,
+    "LearningOutcome": 68,
+    "Concept": 37,
+    "Term": 23,
+    "Misconception": 17,
+    "Distractor": 17,
+    "Community": 7
+  },
+  "rel_counts": {
+    "FOR_SUBJECT": 1,
+    "PART_OF": 108,
+    "COVERS": 43,
+    "PREREQUISITE_OF": 20,
+    "RELATED_TO": 22,
+    "COMMONLY_CONFUSED_WITH": 22,
+    "ABOUT": 17,
+    "DERIVED_FROM": 17,
+    "CONTAINS": 37
+  },
+  "provenance": {
+    "enriched_from": "data/extracted/science-primary-2023.extractions.jsonl"
+  }
+}

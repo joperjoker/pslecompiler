@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.pytest_cache/
+build/
+dist/
+
+# Generated parse cache (regenerable, can be large) — ignore contents
+data/parsed/*
+!data/parsed/.gitkeep
+
+# Artifacts ARE the deliverable (portable Neo4j load files) — keep them,
+# but never commit raw embedding vectors (huge); they are regenerated on load.
+data/artifacts/**/embeddings.*
+
+# Source PDFs: committed deliberately (see data/sources/README.md).
+# Do NOT ignore them — they are the ingestion inputs.
