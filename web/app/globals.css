@@ -1,27 +1,178 @@
+/* ===========================================================================
+   PSLE Practice — cozy pixel-RPG theme (MapleStory/Ragnarok warmth + Nyan pop)
+   Pure CSS + emoji. No image/font assets. Keep it cute and light.
+   =========================================================================== */
 :root {
-  --bg: #0f1220; --card: #1a1f36; --ink: #e8ecf8; --muted: #9aa3c0;
-  --good: #2fbf71; --bad: #e5484d; --accent: #6c8cff; --line: #2a3050;
+  --cream: #fdf3e4;
+  --cream2: #f6e7cf;
+  --paper: #fffdf7;
+  --ink: #3b3357;          /* dark plum text */
+  --ink-soft: #6f6690;
+  --line: #3b3357;         /* chunky outline */
+  --wood: #c9a36a;
+  --pink: #ff90b3;
+  --pink-d: #e76a92;
+  --sky: #74c7ff;
+  --green: #6fd08c;
+  --red: #ff6b6b;
+  --gold: #ffd166;
+  --shadow: 4px 4px 0 rgba(59, 51, 87, 0.25);
 }
+
 * { box-sizing: border-box; }
+
+html { image-rendering: pixelated; }
+
 body {
-  margin: 0; background: var(--bg); color: var(--ink);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  margin: 0;
+  color: var(--ink);
+  font-family: ui-rounded, "Segoe UI", system-ui, -apple-system, sans-serif;
+  background:
+    radial-gradient(circle at 12% 0%, #ffe6f0 0, transparent 38%),
+    radial-gradient(circle at 88% 0%, #e3f3ff 0, transparent 38%),
+    linear-gradient(180deg, var(--cream) 0%, var(--cream2) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
 }
-a { color: var(--accent); text-decoration: none; }
-.wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin: 14px 0; }
-.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+/* tiny dotted "grass/pixel" texture without an image */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: -1; opacity: 0.5;
+  background-image: radial-gradient(rgba(59,51,87,0.06) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+
+a { color: var(--pink-d); text-decoration: none; font-weight: 700; }
+a:hover { color: var(--pink); }
+
+.wrap { max-width: 780px; margin: 0 auto; padding: 16px 14px 80px; }
+
+/* --- "pixel" font feel via spacing/weight, no font file ------------------- */
+.pixel {
+  font-family: ui-monospace, "Courier New", monospace;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 rgba(59,51,87,0.18);
+}
+h1, h2, h3 { font-family: ui-monospace, "Courier New", monospace; letter-spacing: .5px; }
+h1 { font-size: 22px; } h2 { font-size: 16px; } h3 { font-size: 14px; }
+
+/* --- panels (cozy game windows) ------------------------------------------ */
+.card {
+  background: var(--paper);
+  border: 3px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 14px 0;
+  box-shadow: var(--shadow);
+}
+.card.wood {
+  background:
+    repeating-linear-gradient(180deg, #f0d8ad 0 6px, #ecd2a3 6px 12px);
+}
+
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .spacer { flex: 1; }
-.badge { font-size: 12px; color: var(--muted); border: 1px solid var(--line); padding: 2px 8px; border-radius: 999px; }
-.btn { background: var(--accent); color: white; border: 0; border-radius: 10px; padding: 12px 16px; font-size: 15px; cursor: pointer; }
-.btn.ghost { background: transparent; border: 1px solid var(--line); color: var(--ink); }
-.opt { display: block; width: 100%; text-align: left; background: #141833; color: var(--ink);
-  border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin: 8px 0; cursor: pointer; font-size: 15px; }
-.opt:hover { border-color: var(--accent); }
-.opt.correct { border-color: var(--good); background: rgba(47,191,113,.12); }
-.opt.wrong { border-color: var(--bad); background: rgba(229,72,77,.12); }
-.opt .why { display: block; margin-top: 8px; color: var(--muted); font-size: 13px; }
-.stat { font-size: 28px; font-weight: 700; }
-.bar { height: 10px; background: #141833; border-radius: 999px; overflow: hidden; }
-.bar > span { display: block; height: 100%; background: var(--accent); }
-h1 { font-size: 24px; } h2 { font-size: 18px; } .muted { color: var(--muted); }
+.muted { color: var(--ink-soft); }
+
+/* --- chunky pressable buttons -------------------------------------------- */
+.btn {
+  font-family: ui-monospace, "Courier New", monospace;
+  font-weight: 800; letter-spacing: .5px;
+  background: var(--pink); color: #fff;
+  border: 3px solid var(--line); border-radius: 12px;
+  padding: 11px 16px; font-size: 14px; cursor: pointer;
+  box-shadow: 0 4px 0 var(--pink-d), var(--shadow);
+  transition: transform .05s ease, box-shadow .05s ease;
+}
+.btn:hover { filter: brightness(1.03); }
+.btn:active { transform: translateY(4px); box-shadow: 0 0 0 var(--pink-d), var(--shadow); }
+.btn.sky { background: var(--sky); box-shadow: 0 4px 0 #3aa0e6, var(--shadow); }
+.btn.ghost { background: var(--paper); color: var(--ink); box-shadow: 0 4px 0 var(--wood), var(--shadow); }
+
+/* --- badges / chips ------------------------------------------------------ */
+.badge {
+  font-family: ui-monospace, monospace; font-size: 11px; font-weight: 800;
+  color: var(--ink); background: #fff7e6;
+  border: 2px solid var(--line); border-radius: 999px; padding: 3px 9px;
+}
+.chip-lv {
+  background: var(--gold); border: 2px solid var(--line); border-radius: 8px;
+  padding: 2px 8px; font-family: ui-monospace, monospace; font-weight: 800;
+}
+
+/* --- EXP bar (Nyan rainbow) ---------------------------------------------- */
+.bar {
+  height: 14px; background: #efe6d2; border: 2px solid var(--line);
+  border-radius: 999px; overflow: hidden;
+}
+.bar > span {
+  display: block; height: 100%;
+  background: linear-gradient(90deg,#ff5f6d,#ffae42,#ffe65c,#6fd08c,#74c7ff,#b18cff);
+  background-size: 200% 100%;
+  animation: shimmer 2.2s linear infinite;
+}
+@keyframes shimmer { to { background-position: 200% 0; } }
+
+/* skill/mastery bar (calmer) */
+.bar.skill > span {
+  background: linear-gradient(90deg, var(--sky), var(--pink));
+  animation: none;
+}
+
+/* --- Nyan mascot --------------------------------------------------------- */
+.nyan { position: relative; display: inline-flex; align-items: center; height: 34px; }
+.nyan .trail {
+  width: 46px; height: 16px; border-radius: 4px; margin-right: -6px;
+  background: repeating-linear-gradient(180deg,
+    #ff5f6d 0 3px,#ffae42 3px 6px,#ffe65c 6px 9px,#6fd08c 9px 12px,#74c7ff 12px 16px);
+  box-shadow: 2px 2px 0 rgba(59,51,87,.18);
+}
+.nyan .cat { font-size: 26px; animation: bob 1.1s ease-in-out infinite; }
+@keyframes bob { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-3px);} }
+.spark { animation: tw 1.4s ease-in-out infinite; display: inline-block; }
+@keyframes tw { 0%,100%{ opacity:.4; transform: scale(.9);} 50%{ opacity:1; transform: scale(1.15);} }
+
+/* --- HUD top bar --------------------------------------------------------- */
+.hud {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--paper); border: 3px solid var(--line);
+  border-radius: 14px; padding: 8px 12px; box-shadow: var(--shadow);
+}
+.hud .exp { min-width: 140px; flex: 1; }
+
+/* --- options as quest choices -------------------------------------------- */
+.opt {
+  display: block; width: 100%; text-align: left;
+  font-family: inherit; font-size: 15px; color: var(--ink);
+  background: #fff; border: 3px solid var(--line); border-radius: 12px;
+  padding: 13px 14px; margin: 9px 0; cursor: pointer;
+  box-shadow: 0 4px 0 var(--wood);
+  transition: transform .05s ease, box-shadow .05s ease;
+}
+.opt:hover { transform: translateY(-1px); }
+.opt:active { transform: translateY(4px); box-shadow: 0 0 0 var(--wood); }
+.opt.correct { border-color: var(--green); background: #ecffe9; box-shadow: 0 4px 0 #4fae6a; }
+.opt.wrong   { border-color: var(--red);   background: #ffeceb; box-shadow: 0 4px 0 #d44; }
+.opt .why { display: block; margin-top: 8px; color: var(--ink-soft); font-size: 13px; line-height: 1.4; }
+
+.stat { font-family: ui-monospace, monospace; font-size: 26px; font-weight: 800; }
+
+/* --- level-up toast ------------------------------------------------------ */
+.toast {
+  position: fixed; left: 50%; top: 18%; transform: translateX(-50%);
+  background: var(--gold); border: 3px solid var(--line); border-radius: 14px;
+  padding: 12px 18px; font-family: ui-monospace, monospace; font-weight: 800;
+  box-shadow: var(--shadow); z-index: 50; animation: pop .5s ease;
+}
+@keyframes pop { 0%{ transform: translateX(-50%) scale(.7); opacity:0;} 100%{ transform: translateX(-50%) scale(1); opacity:1;} }
+
+/* gentle float-in for cards */
+.float-in { animation: floatIn .25s ease; }
+@keyframes floatIn { from { opacity:0; transform: translateY(6px);} to { opacity:1; transform:none;} }
+
+@media (prefers-reduced-motion: reduce) {
+  .bar > span, .nyan .cat, .spark, .toast, .float-in { animation: none !important; }
+}

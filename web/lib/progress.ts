@@ -30,7 +30,10 @@ export function loadProgress(): Progress {
 }
 
 export function saveProgress(p: Progress) {
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(p));
+  if (typeof window !== "undefined") {
+    localStorage.setItem(KEY, JSON.stringify(p));
+    window.dispatchEvent(new CustomEvent("progress-updated"));
+  }
 }
 
 export function recordAnswer(
