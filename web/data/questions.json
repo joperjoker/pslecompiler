@@ -1,0 +1,149 @@
+[
+  {
+    "qid": "question:science-2023-sample-sci-2023-1:160500492e",
+    "stem": "Which statement about the three states of matter is correct?",
+    "subject": "Science",
+    "syllabus_version": "2023",
+    "theme": "Cycles",
+    "cognitive_level": "comprehension",
+    "difficulty_band": "core",
+    "status": "answered",
+    "provenance": "ingested",
+    "options": [
+      {
+        "label": "1",
+        "text": "A gas has no mass.",
+        "is_correct": false,
+        "rationale": "Incorrect. Gases do have mass, even though it is small and they are often invisible.",
+        "misconception": "Gases do not have mass."
+      },
+      {
+        "label": "2",
+        "text": "A liquid takes the shape of its container but has a fixed volume.",
+        "is_correct": true,
+        "rationale": "Correct. A liquid flows to take the shape of its container while its volume stays fixed.",
+        "misconception": null
+      },
+      {
+        "label": "3",
+        "text": "A solid changes its volume to fill its container.",
+        "is_correct": false,
+        "rationale": "Incorrect. A solid keeps a fixed shape and volume; it does not expand to fill a container.",
+        "misconception": "A solid can change its volume to fit a container."
+      },
+      {
+        "label": "4",
+        "text": "A liquid has its own fixed shape.",
+        "is_correct": false,
+        "rationale": "Incorrect. A liquid has no fixed shape; it takes the shape of its container.",
+        "misconception": "A liquid has a fixed shape."
+      }
+    ],
+    "learning_outcomes": [
+      "learningoutcome:science-2023-differentiate-among-the-three-states-of-matter-solid-liquid-gas-in-:b64e4c0a5b"
+    ],
+    "concepts": [
+      "states of matter",
+      "shape",
+      "volume"
+    ]
+  },
+  {
+    "qid": "question:science-2023-sample-sci-2023-2:ba12904012",
+    "stem": "A bar magnet is brought near several objects. Which statement is correct?",
+    "subject": "Science",
+    "syllabus_version": "2023",
+    "theme": "Interactions",
+    "cognitive_level": "knowledge",
+    "difficulty_band": "foundational",
+    "status": "answered",
+    "provenance": "ingested",
+    "options": [
+      {
+        "label": "1",
+        "text": "The magnet attracts all metals, including aluminium.",
+        "is_correct": false,
+        "rationale": "Incorrect. Magnets attract only magnetic materials (iron, steel); aluminium is not attracted.",
+        "misconception": "A magnet attracts all metals."
+      },
+      {
+        "label": "2",
+        "text": "A bigger magnet is always stronger than a smaller magnet.",
+        "is_correct": false,
+        "rationale": "Incorrect. Strength depends on the magnet, not merely its size; a small magnet can be stronger.",
+        "misconception": "A larger magnet is always stronger than a smaller one."
+      },
+      {
+        "label": "3",
+        "text": "The magnet can exert a push or a pull on magnetic materials.",
+        "is_correct": true,
+        "rationale": "Correct. A magnet exerts a push (repulsion) or a pull (attraction) on magnetic materials.",
+        "misconception": null
+      },
+      {
+        "label": "4",
+        "text": "Two north poles placed together will attract each other.",
+        "is_correct": false,
+        "rationale": "Incorrect. Like poles repel; only unlike poles attract.",
+        "misconception": "Like poles attract each other."
+      }
+    ],
+    "learning_outcomes": [
+      "learningoutcome:science-2023-identify-the-characteristics-of-magnets-magnets-can-be-made-of-iron:eeb9b426e7"
+    ],
+    "concepts": [
+      "magnetic force",
+      "magnetic materials",
+      "magnetic poles"
+    ]
+  },
+  {
+    "qid": "question:science-2023-sample-sci-2023-3:bda4e22395",
+    "stem": "In a circuit with a battery, wires and a bulb, the bulb does not light up. Which is the most likely reason?",
+    "subject": "Science",
+    "syllabus_version": "2023",
+    "theme": "Systems",
+    "cognitive_level": "application",
+    "difficulty_band": "core",
+    "status": "answered",
+    "provenance": "ingested",
+    "options": [
+      {
+        "label": "1",
+        "text": "The circuit is open at one point.",
+        "is_correct": true,
+        "rationale": "Correct. A break (open) anywhere in the circuit stops the current, so the bulb will not light.",
+        "misconception": null
+      },
+      {
+        "label": "2",
+        "text": "Current is used up by the bulb so none returns to the battery.",
+        "is_correct": false,
+        "rationale": "Incorrect. Current is not used up; the same current flows through the whole series circuit.",
+        "misconception": "Electric current is used up by the bulb so less returns to the battery."
+      },
+      {
+        "label": "3",
+        "text": "The bulb can only light in an open circuit.",
+        "is_correct": false,
+        "rationale": "Incorrect. A bulb lights only in a closed circuit, not an open one.",
+        "misconception": "A bulb lights up even in an open circuit."
+      },
+      {
+        "label": "4",
+        "text": "Plastic wires conduct the electricity away.",
+        "is_correct": false,
+        "rationale": "Incorrect. Plastic is an insulator; it does not conduct electricity away.",
+        "misconception": "Plastic is a good conductor of electricity."
+      }
+    ],
+    "learning_outcomes": [
+      "learningoutcome:science-2023-recognise-that-an-electric-circuit-consisting-of-an-energy-source-b:7e950ea487"
+    ],
+    "concepts": [
+      "electric circuit",
+      "closed circuit",
+      "electrical conductor"
+    ]
+  }
+]

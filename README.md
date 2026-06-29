@@ -1,31 +1,43 @@
-# PSLE Question Compiler — Syllabus "Second Brain"
+# PSLE Question Compiler
 
-A knowledge base that ingests the Singapore MOE primary syllabi (English,
-Mathematics, Science, Chinese — Standard level) and breaks them into
-**MCQ-ready atoms** for building a gamified, cognitive-science-anchored question
-bank for PSLE students.
+**The MCQ question bank is the product.** A neurosymbolic system that builds a
+gamified, cognitive-science-anchored PSLE question bank: it **ingests past-year
+papers** into MCQ items, **generates verified answers + per-option feedback**, and
+**tags every question to the MOE syllabus** — served through a Next.js practice app
+with spaced repetition.
 
-It is a **graph-native second brain** with three layers:
+- **Neural** = the LLM (this agent) parsing items, verifying answers, writing
+  per-option rationales, tagging, and generating variants.
+- **Symbolic** = the MOE syllabus knowledge graph + hard validators + retrieval,
+  which constrain and check everything the neural side proposes.
 
-1. **Structured spine** — `Subject → SyllabusVersion → Theme → Topic →
-   LearningOutcome`, versioned by syllabus year (all versions coexist).
-2. **Wiki synthesis layer** — citation-grounded articles per topic/concept.
-3. **GraphRAG layer** — a graph of `Concept / Misconception / Distractor`
-   (the engine for *grounded* MCQ distractors) plus community summaries.
+## The two halves
 
-Target store: **Neo4j** (property graph + vector index + wiki/community nodes).
-Because Neo4j cloud, the embedding-model host, and `moe.gov.sg` are blocked by
+**1. Question bank (product)** — `Paper → Question → Option`, each question tagged
+`ASSESSES`→LearningOutcome / `TESTS`→Concept, with distractor options linked to the
+`Misconception` they embody. Built from uploaded past papers (`data/papers/`) plus
+controlled variants. Feedback = per-option rationale (why right / why wrong).
+See `docs/question-pipeline.md` and `web/` (the app).
+
+**2. Syllabus backbone (scaffolding)** — a Neo4j graph with three layers:
+structured spine (`Subject→Theme→Topic→LearningOutcome`), wiki synthesis, and a
+GraphRAG layer (`Concept/Misconception/Distractor` + communities). The store is
+**Neo4j**; because Neo4j cloud / the embedding host / `moe.gov.sg` are blocked by
 this environment's egress policy, the pipeline emits **portable load artifacts**
-(`nodes.jsonl`, `edges.jsonl`, `load.cypher`) that you apply to your own AuraDB,
-and embeddings are an **optional, pluggable** layer.
+(`nodes.jsonl`, `edges.jsonl`, `load.cypher`) and embeddings are **optional**.
 
 ## Status
 
-- ✅ Vertical slice: **Science 2023** fully ingested from the real MOE PDF —
-  5 themes, 25 topics, **68 learning outcomes** with primary levels and
-  citations. A 7-outcome semantic enrichment demonstrates the
-  concept/misconception/distractor + community layers end to end.
-- ⏳ Phase B: replicate to Mathematics 2021, English 2020, Chinese 2015/2024.
+- ✅ **Syllabus backbone:** Science 2023 fully ingested from the real MOE PDF —
+  5 themes, 25 topics, **68 learning outcomes** (cited), with a 7-outcome
+  enrichment (concepts/misconceptions/distractors + communities).
+- ✅ **Question engine:** paper parser, neurosymbolic tagging, answer+feedback,
+  variants, QA validators, export — proven on a worked sample paper (3 questions,
+  0 QA errors).
+- ✅ **App:** Next.js practice app (build-verified) — practice + per-option
+  feedback + spaced repetition + mastery dashboard; Vercel + Supabase ready.
+- ⏳ **Next:** ingest your real past papers; replicate the backbone to
+  Mathematics 2021, English 2020, Chinese 2015/2024.
 
 ## Quickstart
 

@@ -31,6 +31,10 @@ MISCONCEPTION = "Misconception"
 DISTRACTOR = "Distractor"
 WIKI_ARTICLE = "WikiArticle"
 COMMUNITY = "Community"
+# Question-bank entities (the product layer)
+PAPER = "Paper"
+QUESTION = "Question"
+OPTION = "Option"
 
 # --- Relationship types ------------------------------------------------------
 FOR_SUBJECT = "FOR_SUBJECT"
@@ -44,6 +48,14 @@ DERIVED_FROM = "DERIVED_FROM"
 SYNTHESIZES = "SYNTHESIZES"
 CITES = "CITES"
 CONTAINS = "CONTAINS"
+# Question-bank relationships
+FROM_PAPER = "FROM_PAPER"
+HAS_OPTION = "HAS_OPTION"
+ASSESSES = "ASSESSES"            # Question -> LearningOutcome
+TESTS = "TESTS"                  # Question -> Concept
+BELONGS_TO = "BELONGS_TO"        # Question -> SyllabusVersion
+EMBODIES = "EMBODIES"            # Option -> Misconception
+VARIANT_OF = "VARIANT_OF"        # Question -> Question
 
 
 def slugify(text: str) -> str:
@@ -86,7 +98,7 @@ class KnowledgeGraph(BaseModel):
     edges: dict[tuple, Edge] = Field(default_factory=dict)
 
     # -- mutation -------------------------------------------------------------
-    def add_node(self, label: str, uid: str, **props: Any) -> str:
+    def add_node(self, node_label: str, uid: str, **props: Any) -> str:
         if uid in self.nodes:
             # merge props (later writes win for non-empty values)
             existing = self.nodes[uid].props
@@ -94,7 +106,7 @@ class KnowledgeGraph(BaseModel):
                 if v is not None and v != "":
                     existing[k] = v
         else:
-            self.nodes[uid] = Node(uid=uid, label=label, props=dict(props))
+            self.nodes[uid] = Node(uid=uid, label=node_label, props=dict(props))
         return uid
 
     def add_edge(self, src: str, rel: str, dst: str, **props: Any) -> None:

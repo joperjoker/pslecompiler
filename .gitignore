@@ -17,5 +17,12 @@ data/parsed/*
 # but never commit raw embedding vectors (huge); they are regenerated on load.
 data/artifacts/**/embeddings.*
 
+# Node / Next.js (web app)
+web/node_modules/
+web/.next/
+web/out/
+web/.vercel/
+*.tsbuildinfo
+
 # Source PDFs: committed deliberately (see data/sources/README.md).
 # Do NOT ignore them — they are the ingestion inputs.

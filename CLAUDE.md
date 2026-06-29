@@ -54,6 +54,32 @@ you are creating an excellent multiple choice question bank for PSLE students to
 gain mastery in the subjects (English, Mathematics, Chinese and Science) through
 repeated practice in a gamified manner that's anchored on cognitive science.
 
+### What's at the forefront (read this)
+
+**The MCQ question bank is the product.** Everything serves the questions:
+
+- **Backbone (symbolic):** the MOE syllabus ingested into a Neo4j knowledge graph
+  — `Subject → Theme → Topic → LearningOutcome → Concept → Misconception`. This is
+  scaffolding, not the deliverable. (Phase A — done; Science 2023 fully ingested.)
+- **Question bank (the product):** built by **ingesting past-year papers** into
+  MCQ items, then **generating verified answers + per-option feedback** and
+  **syllabus tags**, plus **controlled variants**. `Paper / Question / Option`
+  nodes tagged into the graph; distractors linked to the `Misconception` they
+  embody.
+- **Neurosymbolic framing:** the syllabus graph + validators (`qa_questions.py`) +
+  retrieval (`retrieve.py`, `tag.py`) are the *symbolic* constraints; the LLM
+  (this agent) parsing/answering/explaining/tagging is the *neural* part; they run
+  in a propose → validate → critique loop (proposer/challenger/judge).
+- **Feedback:** per-option rationale (why right / why each distractor is wrong,
+  tied to its misconception) is a first-class output.
+- **Delivery:** a gamified Next.js app (`web/`, Vercel + Supabase) with spaced
+  repetition (SM-2), concept mastery, points and streaks.
+
+Architecture details live in `docs/` (`architecture.md`, `question-pipeline.md`,
+`app.md`, `data-model.md`, `retrieval-algorithm.md`, `runbook.md`). Pipeline:
+`src/pslecompiler/`. App: `web/`. Source PDFs: `data/sources/` (syllabi),
+`data/papers/` (past papers).
+
 ## Default Persona
 
 Act as a team of Examination board assessors, Head of Department of Science,

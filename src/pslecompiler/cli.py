@@ -25,6 +25,10 @@ from .retrieve import QuestionSpec, retrieve
 from .science2023 import parse_science_2023
 from .sources import get_source
 from .structure import build_spine
+from .export_questions import write_question_bank
+from .paper_parse import parse_paper_pdf
+from .qa_questions import summarize, validate_questions
+from .sample import build_sample_question_graph
 
 # Subjects whose real PDFs are table-based get a PDF-native parser instead of
 # the heading-driven Section flow.
@@ -98,6 +102,48 @@ def cmd_retrieve(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_ingest_paper(args: argparse.Namespace) -> int:
+    """Parse a past-paper PDF into raw MCQ items (agent then authors answers/tags)."""
+    config.ensure_dirs()
+    pdf = config.DATA / "papers" / args.paper
+    if not pdf.exists():
+        print(f"ERROR: {pdf} not found (commit it to data/papers/).", file=sys.stderr)
+        return 2
+    items = parse_paper_pdf(pdf)
+    out = config.DATA / "questions" / f"{pdf.stem}.raw.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps([it.model_dump() for it in items], indent=2,
+                              ensure_ascii=False), encoding="utf-8")
+    print(f"Extracted {len(items)} raw items -> {out}")
+    print("Next: author tagging + answer/feedback (prompts/), then 'questions-qa'.")
+    return 0
+
+
+def cmd_questions_demo(args: argparse.Namespace) -> int:
+    """Build the worked sample paper into the syllabus graph, QA, export bank."""
+    config.ensure_dirs()
+    out = _artifact_dir(args.stem)
+    base = load_jsonl_graph(out / "nodes.jsonl", out / "edges.jsonl")
+    kg, qids = build_sample_question_graph(base)
+    issues = validate_questions(kg)
+    bank = config.DATA / "questions" / "sample"
+    manifest = write_question_bank(kg, bank, published_only=True)
+    print(f"Built {len(qids)} sample questions; QA: {summarize(issues)}")
+    for i in issues:
+        print(f"  [{i['severity']}] {i['message']}")
+    print(f"Question bank -> {bank} ({manifest})")
+    return 0
+
+
+def cmd_questions_qa(args: argparse.Namespace) -> int:
+    out = _artifact_dir(args.stem)
+    kg = load_jsonl_graph(out / "nodes.jsonl", out / "edges.jsonl")
+    issues = validate_questions(kg)
+    print(json.dumps({"summary": summarize(issues), "issues": issues},
+                     indent=2, ensure_ascii=False))
+    return 0 if summarize(issues)["errors"] == 0 else 1
+
+
 def cmd_load(args: argparse.Namespace) -> int:
     from .graphdb import Neo4jQueryClient
 
@@ -143,6 +189,19 @@ def build_parser() -> argparse.ArgumentParser:
     pl = sub.add_parser("load", help="OPTIONAL: push artifacts to Neo4j")
     pl.add_argument("--stem", required=True)
     pl.set_defaults(func=cmd_load)
+
+    pip = sub.add_parser("ingest-paper", help="past-paper PDF -> raw MCQ items")
+    pip.add_argument("--paper", required=True, help="filename in data/papers/")
+    pip.set_defaults(func=cmd_ingest_paper)
+
+    pqd = sub.add_parser("questions-demo",
+                         help="build the worked sample paper + export bank")
+    pqd.add_argument("--stem", required=True, help="syllabus artifact dir name")
+    pqd.set_defaults(func=cmd_questions_demo)
+
+    pqa = sub.add_parser("questions-qa", help="validate questions in an artifact graph")
+    pqa.add_argument("--stem", required=True)
+    pqa.set_defaults(func=cmd_questions_qa)
     return p
 
 
