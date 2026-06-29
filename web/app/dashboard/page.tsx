@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Progress, loadProgress } from "@/lib/progress";
 import { levelFromPoints } from "@/lib/level";
+import { useGame } from "@/components/GameProvider";
 
 export default function Dashboard() {
-  const [prog, setProg] = useState<Progress | null>(null);
-  useEffect(() => setProg(loadProgress()), []);
-  if (!prog) return <main><div className="card">Loading…</div></main>;
+  const { progress: prog, ready } = useGame();
+  if (!ready) return <main><div className="card">Loading…</div></main>;
 
   const lv = levelFromPoints(prog.points);
   const concepts = Object.entries(prog.mastery).sort(

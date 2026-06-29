@@ -1,26 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { loadProgress } from "@/lib/progress";
+import { useGame } from "./GameProvider";
 import { levelFromPoints } from "@/lib/level";
 
 // Live MMORPG-style HUD: Nyan mascot + level + EXP bar + star coins + streak.
 export default function Hud() {
-  const [points, setPoints] = useState(0);
-  const [streak, setStreak] = useState(0);
-
-  useEffect(() => {
-    const read = () => {
-      const p = loadProgress();
-      setPoints(p.points);
-      setStreak(p.streak);
-    };
-    read();
-    window.addEventListener("progress-updated", read);
-    return () => window.removeEventListener("progress-updated", read);
-  }, []);
-
-  const lv = levelFromPoints(points);
+  const { progress, user } = useGame();
+  const lv = levelFromPoints(progress.points);
 
   return (
     <div className="hud">
@@ -31,13 +17,13 @@ export default function Hud() {
       <span className="chip-lv">Lv {lv.level}</span>
       <div className="exp">
         <div className="row" style={{ justifyContent: "space-between", marginBottom: 2 }}>
-          <span className="badge">{lv.title}</span>
+          <span className="badge">{user ? user.email.split("@")[0] : lv.title}</span>
           <span className="muted" style={{ fontSize: 11 }}>{lv.intoLevel}/{lv.span} EXP</span>
         </div>
         <div className="bar"><span style={{ width: `${lv.pct}%` }} /></div>
       </div>
-      <span className="badge">⭐ {points}</span>
-      <span className="badge">🔥 {streak}</span>
+      <span className="badge">⭐ {progress.points}</span>
+      <span className="badge">🔥 {progress.streak}</span>
     </div>
   );
 }

@@ -17,11 +17,22 @@ the user's **past-year paper PDFs** to populate real questions.
   (reuses `retrieve.py`), `qa_questions.py`, `export_questions.py`, `sample.py`.
   CLI: `ingest-paper`, `questions-demo`, `questions-qa`. Prompts in `prompts/`.
   Proven on a synthetic sample paper (3 Qs, **0 QA errors**).
-- **App (`web/`):** Next.js (build-verified, 4 routes). Cozy pixel-RPG + Nyan Cat
-  theme, **pure CSS + emoji, no image/font assets**. Town/Quest/Stats pages,
+- **App (`web/`):** Next.js (build-verified, 5 routes). Cozy pixel-RPG + Nyan Cat
+  theme, **pure CSS + emoji, no image/font assets**. Town/Quest/Stats/Login pages,
   live HUD (Lv/EXP/coins/streak), SM-2 spaced repetition (`web/lib/srs.ts`),
   leveling (`web/lib/level.ts`). Serves from Supabase if env set, else the
   bundled seed `web/data/questions.json`.
+- **Auth + persistence:** email+password via Supabase Auth (`web/lib/auth.ts`,
+  `GameProvider.tsx`, `/login`). EXP/level/streak/mastery persist to the account
+  (`profiles`/`attempts`/`mastery`, migration `0002`); **guest mode** (localStorage)
+  is the fallback when Supabase env isn't set. SRS schedule stays device-local.
+- **Rich question format:** stem `Block`s (text/image/table), per-option image,
+  `hint`, and a **2nd-attempt flow** (first miss → hint + retry, then full
+  per-option feedback; attempt-aware EXP). Table question in the sample.
+- **Hardened paper parser:** page render to PNG, embedded-image extraction,
+  table detection, and a `needs_vision` flag for full-page/image-only items
+  (`paper_parse.py`); validated on a generated mock PDF.
+- **Tests:** 19 passing.
 - **Stores:** Neo4j = authoring graph (portable artifacts in `data/artifacts/`
   since cloud/egress blocked here); Supabase = serving + learner data
   (`supabase/migrations/0001_init.sql`).
@@ -40,12 +51,17 @@ the user's **past-year paper PDFs** to populate real questions.
 2. Go-ahead to **provision Supabase + deploy Vercel** (via MCP integrations).
 3. Optional: **Neo4j AuraDB** creds for the live graph.
 
-## Next actions (pick up here) — user leaning undecided between #2 and #3
-1. **Harden paper ingestion** against a *realistic mock* PSLE paper PDF
-   (multi-column, figures, answer-key page) + agent fallback. (My recommendation.)
-2. **Stand up Supabase + deploy to Vercel** for a clickable live demo.
-3. Polish app UX: session-summary screen, combo/daily-goal juice, cute /not-found.
-4. Expand backbone: Math 2021 / English 2020 / Chinese 2015&2024 parsers.
+## Next actions (pick up here)
+1. **Provision Supabase + deploy to Vercel** (user chose "build ready, provision
+   later"). Apply `supabase/migrations/0001`+`0002`, set `NEXT_PUBLIC_SUPABASE_*`,
+   load a bank via `export_questions` import.sql, deploy `web/` to Vercel.
+2. **Agent vision pass** for `needs_vision` items: render full-page/image-only
+   questions → agent transcribes stem+options+figure → RawItem. Wire into
+   `ingest-paper`.
+3. **Real papers:** once uploaded to `data/papers/`, run ingest → tag →
+   answer/feedback → variants → QA → export → reseed `web/data/questions.json`.
+4. Polish app UX: session-summary screen, combo/daily-goal juice, cute /not-found.
+5. Expand backbone: Math 2021 / English 2020 / Chinese 2015&2024 parsers.
 
 ## How to run (quick)
 ```bash

@@ -37,6 +37,13 @@ _FEEDBACK = {
         ("3", "Incorrect. A bulb lights only in a closed circuit, not an open one.", "A bulb lights up even in an open circuit."),
         ("4", "Incorrect. Plastic is an insulator; it does not conduct electricity away.", "Plastic is a good conductor of electricity."),
     ]},
+    4: {"answer": "2", "cog": "application", "diff": "core", "concepts":
+        ["magnetic materials"], "theme": "Interactions", "opts": [
+        ("1", "Incorrect. W is not attracted to the magnet, so it is not magnetic.", "An object that is not attracted to a magnet is still magnetic."),
+        ("2", "Correct. X is attracted to the magnet, so it is most likely a magnetic material.", ""),
+        ("3", "Incorrect. Y is not attracted to the magnet, so it is not magnetic.", "An object that is not attracted to a magnet is still magnetic."),
+        ("4", "Incorrect. Z is not attracted to the magnet, so it is not magnetic.", "An object that is not attracted to a magnet is still magnetic."),
+    ]},
 }
 
 

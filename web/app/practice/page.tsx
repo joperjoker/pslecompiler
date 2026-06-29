@@ -3,66 +3,67 @@
 import { useEffect, useMemo, useState } from "react";
 import { loadQuestions } from "@/lib/bank";
 import { Question } from "@/lib/types";
-import { Progress, loadProgress, recordAnswer, dueOrder } from "@/lib/progress";
+import { loadProgress, dueOrder } from "@/lib/progress";
 import { levelFromPoints } from "@/lib/level";
+import { useGame } from "@/components/GameProvider";
+import QuestionBlocks from "@/components/QuestionBlocks";
 
 export default function Practice() {
+  const { progress, answer } = useGame();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [idx, setIdx] = useState(0);
-  const [chosen, setChosen] = useState<string | null>(null);
   const [shownAt, setShownAt] = useState<number>(Date.now());
-  const [gain, setGain] = useState<number>(0);
+  // attempt state
+  const [picks, setPicks] = useState<string[]>([]);   // labels tried, in order
+  const [revealed, setRevealed] = useState(false);    // show full feedback?
+  const [gain, setGain] = useState(0);
   const [levelUp, setLevelUp] = useState<number | null>(null);
 
   useEffect(() => {
-    const subject =
-      new URLSearchParams(window.location.search).get("subject") || undefined;
-    loadQuestions(subject).then((qs) =>
-      setQuestions(dueOrder(loadProgress(), qs))
-    );
-    setShownAt(Date.now());
+    const subject = new URLSearchParams(window.location.search).get("subject") || undefined;
+    loadQuestions(subject).then((qs) => setQuestions(dueOrder(loadProgress(), qs)));
+    reset();
   }, []);
 
   const q = questions[idx];
-  const answered = chosen !== null;
-  const correctLabel = useMemo(
-    () => q?.options.find((o) => o.is_correct)?.label,
-    [q]
-  );
+  const correctLabel = useMemo(() => q?.options.find((o) => o.is_correct)?.label, [q]);
 
   if (!q) return <main><div className="card">Loading quest…</div></main>;
 
+  function reset() {
+    setPicks([]); setRevealed(false); setGain(0); setShownAt(Date.now());
+  }
+
   function choose(label: string) {
-    if (answered) return;
-    const before = loadProgress();
-    const beforeLv = levelFromPoints(before.points).level;
+    if (revealed || picks.includes(label)) return;
+    const attemptNo = picks.length + 1;
     const correct = label === correctLabel;
-    setChosen(label);
-    const after: Progress = recordAnswer(
-      before, q.qid, q.concepts || [], correct, Date.now() - shownAt
-    );
-    setGain(after.points - before.points);
-    const afterLv = levelFromPoints(after.points).level;
-    if (afterLv > beforeLv) {
-      setLevelUp(afterLv);
-      setTimeout(() => setLevelUp(null), 2200);
-    }
+    const nextPicks = [...picks, label];
+    setPicks(nextPicks);
+
+    // First wrong attempt with a hint available -> let them try once more.
+    const allowRetry = !correct && attemptNo === 1 && !!q.hint;
+    if (allowRetry) return;
+
+    // Otherwise score this attempt and reveal full feedback.
+    const beforeLv = levelFromPoints(progress.points).level;
+    const g = answer({
+      qid: q.qid, concepts: q.concepts || [], correct,
+      latencyMs: Date.now() - shownAt, attemptNo,
+    });
+    setGain(g); setRevealed(true);
+    const afterLv = levelFromPoints(progress.points + g).level;
+    if (afterLv > beforeLv) { setLevelUp(afterLv); setTimeout(() => setLevelUp(null), 2200); }
   }
 
-  function next() {
-    setChosen(null);
-    setGain(0);
-    setShownAt(Date.now());
-    setIdx((i) => (i + 1) % questions.length);
-  }
+  function next() { setIdx((i) => (i + 1) % questions.length); reset(); }
 
-  const correct = chosen === correctLabel;
+  const firstMiss = picks.length === 1 && picks[0] !== correctLabel && !revealed;
+  const finalCorrect = revealed && picks[picks.length - 1] === correctLabel;
 
   return (
     <main>
-      {levelUp !== null && (
-        <div className="toast">🎉 LEVEL UP! → Lv {levelUp} ✨</div>
-      )}
+      {levelUp !== null && <div className="toast">🎉 LEVEL UP! → Lv {levelUp} ✨</div>}
 
       <div className="row" style={{ marginTop: 12 }}>
         <span className="badge">{q.subject}</span>
@@ -75,15 +76,19 @@ export default function Practice() {
       </div>
 
       <div className="card float-in" key={q.qid}>
-        <h2>{q.stem}</h2>
+        <QuestionBlocks q={q} />
+
         {q.options.map((o) => {
+          const tried = picks.includes(o.label);
           let cls = "opt";
-          if (answered && o.label === correctLabel) cls += " correct";
-          else if (answered && o.label === chosen) cls += " wrong";
+          if (revealed && o.label === correctLabel) cls += " correct";
+          else if ((revealed || tried) && o.label !== correctLabel && tried) cls += " wrong";
           return (
-            <button key={o.label} className={cls} onClick={() => choose(o.label)}>
+            <button key={o.label} className={cls} onClick={() => choose(o.label)}
+                    disabled={revealed || (tried && !revealed)}>
               <span><strong>({o.label})</strong> {o.text}</span>
-              {answered && (o.label === correctLabel || o.label === chosen) && (
+              {o.image && <img src={o.image} alt="" style={{ display: "block", maxHeight: 90, marginTop: 8 }} />}
+              {revealed && (o.label === correctLabel || tried) && (
                 <span className="why">
                   {o.label === correctLabel ? "✅ " : "❌ "}{o.rationale}
                   {o.misconception && o.label !== correctLabel && (
@@ -95,15 +100,20 @@ export default function Practice() {
           );
         })}
 
-        {answered && (
+        {firstMiss && (
+          <div className="card" style={{ background: "#fff7e6", marginTop: 10 }}>
+            <strong className="pixel" style={{ fontSize: 12 }}>Not quite — try again! </strong>
+            <span className="muted">💡 {q.hint}</span>
+          </div>
+        )}
+
+        {revealed && (
           <div className="row" style={{ marginTop: 12 }}>
-            <span className="pixel" style={{ color: correct ? "var(--green)" : "var(--red)" }}>
-              {correct ? "VICTORY!" : "OUCH!"}
+            <span className="pixel" style={{ color: finalCorrect ? "var(--green)" : "var(--red)" }}>
+              {finalCorrect ? (picks.length > 1 ? "RECOVERED!" : "VICTORY!") : "OUCH!"}
             </span>
             {gain > 0 && <span className="badge">+{gain} EXP ⭐</span>}
-            <span className="muted" style={{ fontSize: 12 }}>
-              {(q.concepts || []).join(" · ") || "—"}
-            </span>
+            <span className="muted" style={{ fontSize: 12 }}>{(q.concepts || []).join(" · ")}</span>
             <span className="spacer" />
             <button className="btn" onClick={next}>Next ▶</button>
           </div>

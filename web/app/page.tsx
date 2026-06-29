@@ -2,20 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { loadQuestions, subjectsOf } from "@/lib/bank";
+import { useGame } from "@/components/GameProvider";
 
 const SUBJECT_ICON: Record<string, string> = {
   Science: "🔬", Mathematics: "➗", English: "📖", Chinese: "🧧",
 };
 
 export default function Home() {
+  const { progress, user, configured } = useGame();
   const [subjects, setSubjects] = useState<string[]>([]);
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    loadQuestions().then((qs) => {
-      setSubjects(subjectsOf(qs));
-      setCount(qs.length);
-    });
+    loadQuestions().then((qs) => { setSubjects(subjectsOf(qs)); setCount(qs.length); });
   }, []);
 
   return (
@@ -29,12 +28,22 @@ export default function Home() {
           </span>
           <span className="spark">✨</span>
         </div>
-        <h1 className="pixel" style={{ marginBottom: 4 }}>Welcome, adventurer!</h1>
+        <h1 className="pixel" style={{ marginBottom: 4 }}>
+          {user ? `Welcome back, ${user.email.split("@")[0]}!` : "Welcome, adventurer!"}
+        </h1>
         <p className="muted" style={{ marginTop: 0 }}>
           Defeat questions, earn EXP, level up. Every battle is tagged to the MOE
           syllabus, with feedback on why each answer is right or wrong.
         </p>
         <a className="btn" href="/practice">▶ Start quest</a>
+        {configured && !user && (
+          <a className="btn ghost" href="/login" style={{ marginLeft: 8 }}>Log in to save EXP</a>
+        )}
+        {!configured && (
+          <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>
+            Guest mode — progress saves on this device. (Accounts activate when Supabase is configured.)
+          </p>
+        )}
       </div>
 
       <h2 className="pixel">Maps · {count} questions</h2>
@@ -43,14 +52,10 @@ export default function Home() {
           <span style={{ fontSize: 26 }}>{SUBJECT_ICON[s] ?? "🗺️"}</span>
           <strong className="pixel" style={{ fontSize: 14 }}>{s}</strong>
           <span className="spacer" />
-          <a className="btn sky" href={`/practice?subject=${encodeURIComponent(s)}`}>
-            Enter
-          </a>
+          <a className="btn sky" href={`/practice?subject=${encodeURIComponent(s)}`}>Enter</a>
         </div>
       ))}
-      {subjects.length === 0 && (
-        <p className="muted">Loading the world map…</p>
-      )}
+      {subjects.length === 0 && <p className="muted">Loading the world map…</p>}
     </main>
   );
 }

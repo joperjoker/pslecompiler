@@ -6,18 +6,27 @@ from pslecompiler.model import QUESTION, OPTION
 
 def test_sample_questions_build_and_pass_qa(science_kg):
     kg, qids = build_sample_question_graph(science_kg)
-    assert len(qids) == 3
-    assert len(kg.nodes_with_label(QUESTION)) == 3
-    assert len(kg.nodes_with_label(OPTION)) == 12
+    assert len(qids) == 4
+    assert len(kg.nodes_with_label(QUESTION)) == 4
+    assert len(kg.nodes_with_label(OPTION)) == 16
 
     issues = validate_questions(kg)
     assert summarize(issues)["errors"] == 0
 
 
+def test_table_question_has_blocks_and_hint(science_kg):
+    kg, _ = build_sample_question_graph(science_kg)
+    recs = questions_to_records(kg, published_only=True)
+    tbl = next(r for r in recs if any(b["type"] == "table" for b in r["stem_blocks"]))
+    assert tbl["hint"]
+    table_block = next(b for b in tbl["stem_blocks"] if b["type"] == "table")
+    assert table_block["rows"]
+
+
 def test_each_question_has_one_key_and_rationales(science_kg):
     kg, _ = build_sample_question_graph(science_kg)
     recs = questions_to_records(kg, published_only=True)
-    assert len(recs) == 3
+    assert len(recs) == 4
     for r in recs:
         correct = [o for o in r["options"] if o["is_correct"]]
         assert len(correct) == 1

@@ -34,14 +34,21 @@ def questions_to_records(kg: KnowledgeGraph, published_only: bool = False) -> li
             options.append({
                 "label": o.props.get("label"),
                 "text": o.props.get("text"),
+                "image": o.props.get("image") or None,
                 "is_correct": bool(o.props.get("is_correct")),
                 "rationale": o.props.get("rationale", ""),
                 "misconception": misc[0] if misc else None,
             })
         options.sort(key=lambda x: x["label"] or "")
+        try:
+            blocks = json.loads(q.props.get("stem_blocks") or "[]")
+        except (ValueError, TypeError):
+            blocks = []
         records.append({
             "qid": q.uid,
             "stem": q.props.get("stem"),
+            "stem_blocks": blocks,
+            "hint": q.props.get("hint") or "",
             "subject": q.props.get("subject"),
             "syllabus_version": q.props.get("syllabus_version"),
             "theme": q.props.get("theme"),
@@ -68,23 +75,29 @@ def _sql_str(v) -> str:
 def emit_sql(records: list[dict]) -> str:
     lines = ["-- Generated question bank import for Supabase", "BEGIN;"]
     for r in records:
+        blocks_json = json.dumps(r.get("stem_blocks") or [], ensure_ascii=False)
         lines.append(
-            "INSERT INTO questions (qid, stem, subject, syllabus_version, theme, "
-            "cognitive_level, difficulty_band, status, provenance) VALUES ("
-            f"{_sql_str(r['qid'])}, {_sql_str(r['stem'])}, {_sql_str(r['subject'])}, "
-            f"{_sql_str(r['syllabus_version'])}, {_sql_str(r['theme'])}, "
-            f"{_sql_str(r['cognitive_level'])}, {_sql_str(r['difficulty_band'])}, "
-            f"{_sql_str(r['status'])}, {_sql_str(r['provenance'])}) "
-            "ON CONFLICT (qid) DO UPDATE SET stem=EXCLUDED.stem;"
+            "INSERT INTO questions (qid, stem, stem_blocks, hint, subject, "
+            "syllabus_version, theme, cognitive_level, difficulty_band, status, "
+            "provenance) VALUES ("
+            f"{_sql_str(r['qid'])}, {_sql_str(r['stem'])}, "
+            f"{_sql_str(blocks_json)}::jsonb, {_sql_str(r.get('hint') or '')}, "
+            f"{_sql_str(r['subject'])}, {_sql_str(r['syllabus_version'])}, "
+            f"{_sql_str(r['theme'])}, {_sql_str(r['cognitive_level'])}, "
+            f"{_sql_str(r['difficulty_band'])}, {_sql_str(r['status'])}, "
+            f"{_sql_str(r['provenance'])}) "
+            "ON CONFLICT (qid) DO UPDATE SET stem=EXCLUDED.stem, "
+            "stem_blocks=EXCLUDED.stem_blocks, hint=EXCLUDED.hint;"
         )
         for o in r["options"]:
             lines.append(
-                "INSERT INTO options (qid, label, text, is_correct, rationale, misconception) VALUES ("
+                "INSERT INTO options (qid, label, text, image, is_correct, rationale, misconception) VALUES ("
                 f"{_sql_str(r['qid'])}, {_sql_str(o['label'])}, {_sql_str(o['text'])}, "
+                f"{_sql_str(o.get('image'))}, "
                 f"{_sql_str(o['is_correct'])}, {_sql_str(o['rationale'])}, "
                 f"{_sql_str(o['misconception'])}) "
                 "ON CONFLICT (qid, label) DO UPDATE SET text=EXCLUDED.text, "
-                "is_correct=EXCLUDED.is_correct, rationale=EXCLUDED.rationale;"
+                "image=EXCLUDED.image, is_correct=EXCLUDED.is_correct, rationale=EXCLUDED.rationale;"
             )
         for c in r["concepts"]:
             lines.append(

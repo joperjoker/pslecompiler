@@ -1,5 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { GameProvider } from "@/components/GameProvider";
+import TopBar from "@/components/TopBar";
 import Hud from "@/components/Hud";
 
 export const metadata: Metadata = {
@@ -11,19 +13,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <div className="wrap">
-          <div className="row" style={{ marginBottom: 10 }}>
-            <a href="/" className="pixel" style={{ fontSize: 16 }}>
-              🍄 PSLE&nbsp;Quest
-            </a>
-            <span className="spacer" />
-            <a href="/" className="badge">Town</a>
-            <a href="/practice" className="badge">Quest</a>
-            <a href="/dashboard" className="badge">Stats</a>
+        <GameProvider>
+          <div className="wrap">
+            <TopBar />
+            <Hud />
+            {children}
           </div>
-          <Hud />
-          {children}
-        </div>
+        </GameProvider>
       </body>
     </html>
   );

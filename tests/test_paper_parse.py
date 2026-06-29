@@ -18,6 +18,10 @@ def test_parse_paper_text_extracts_items():
 def test_build_sample_paper():
     meta, items = build_sample_paper()
     assert meta["subject"] == "Science"
-    assert len(items) == 3
+    assert len(items) == 4
     assert all(len(it.options) == 4 for it in items)
     assert all(it.answer_index is not None for it in items)
+    # the table question carries a table block + a hint
+    table_item = next(it for it in items if any(b.type == "table" for b in it.blocks))
+    assert table_item.hint
+    assert all(it.hint for it in items)
